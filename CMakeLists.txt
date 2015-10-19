@@ -10,7 +10,6 @@ project( CVars )
 
 # Add to module path, so we can find our cmake modules
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules )
-include( install_package )
 include( SetPlatformVars )
 include( CheckCXXSourceRuns )
 
@@ -68,6 +67,17 @@ if( HAVE_GLES_2 )
     list(APPEND SOURCES ${SRCDIR}/gl2engine.cpp)
 endif()
 
+#####
+# catkin compatibility
+if(catkin_package)
+  find_package(catkin QUIET)
+endif()
+
+if( catkin_FOUND )
+  message("catkin found; will build with catkin compatibility")
+else()
+  message("catkin not found; will do traditional installation")
+endif()
 
 # Set version values in config.h  (see config.h.in)
 configure_file( src/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/CVars/config.h IMMEDIATE )
@@ -137,20 +147,30 @@ set( FLCONSOLE_HEADERS
         include/FLConsole/FLConsoleFunction.h
    )
 
+if(catkin_FOUND)
+  catkin_package(
+    INCLUDE_DIRS include
+    LIBRARIES cvars
+    DEPENDS)
+endif()
+
 # include CVAR_HDRS in add_library so QtCreator will detect them.
 add_library( cvars SHARED ${CVAR_SRCS} ${CVAR_HDRS} ${GLCONSOLE_HEADERS}
  ${FLCONSOLE_HEADERS} )
 
 ##############################################################################
-install_package(
-    PKG_NAME CVars
-    LIB_NAME cvars
-    VERSION ${VERSION}
-    DESCRIPTION "Library for runtime variable editing for fast prototyping."
-    INSTALL_INCLUDE_DIR true
-    INSTALL_GENERATED_HEADERS ${CMAKE_CURRENT_BINARY_DIR}/include/CVars/config.h
-    DESTINATION ${CMAKE_INSTALL_PREFIX}
-    )
+if(NOT catkin_FOUND)
+  include( install_package )
+  install_package(
+      PKG_NAME CVars
+      LIB_NAME cvars
+      VERSION ${VERSION}
+      DESCRIPTION "Library for runtime variable editing for fast prototyping."
+      INSTALL_INCLUDE_DIR true
+      INSTALL_GENERATED_HEADERS ${CMAKE_CURRENT_BINARY_DIR}/include/CVars/config.h
+      DESTINATION ${CMAKE_INSTALL_PREFIX}
+      )
+endif()
 
 # make an uninstall target
 include(${CMAKE_MODULE_PATH}/cmake_uninstall.cmake.in)

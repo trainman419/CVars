@@ -1,0 +1,16 @@
+<package format="2">
+  <name>CVars</name>
+  <version>0.0.1</version>
+  <description>The CVars package</description>
+  <license>LGPL</license>
+
+  <maintainer email="gabe@todo.todo">Gabe Sibley</maintainer>
+
+  <author>Michael Mandel</author>
+  <author>Gabe Sibley</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- TODO: depend on GLUT or FLTK ?? -->
+
+</package>
